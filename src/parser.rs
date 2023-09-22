@@ -4,7 +4,6 @@ use std::{
 };
 use scraper::{Html, Selector};
 
-
 fn get_tag(html: Arc<String>, tag: String) {
 
     let document = Html::parse_document(html.as_str());

@@ -1,22 +1,30 @@
 
-pub mod parser;
+mod parser;
+mod http;
+
+#[allow(unused)]
 
 use std::{
-    io::Read,
+    io::{Read, Write},
+    net::TcpStream,
     fs,
-    sync::Arc
+    sync::Arc,
+    rc::Rc
 };
+use http::request::HttpClient; //modulo de request implementado em ./http/request.rs
+use http::request::Http;
 
-fn main() {
+fn main() -> std::io::Result<()> {
 
-    let file_path = "Exemplo/pagina.html";
-    let mut file = fs::File::open(file_path).expect("Failed to open file");
+    let mut client = HttpClient::new(Rc::new("127.0.0.1:8080".to_string()));
 
-    let mut html_contents = String::new();
+    let response = client.get(None)?;
 
-    file.read_to_string(&mut html_contents).expect("Failed to read file");
+    println!("Response:\n{}", response);
 
-    let html: Arc<String> = Arc::new(html_contents.clone());
+    let html_contents = response.to_string();
+
+    let html: Arc<String> = Arc::new(html_contents);
 
     let tags: Vec<String> = vec![
         "link".to_string(),
@@ -25,4 +33,8 @@ fn main() {
     ];
 
     parser::tag_handler(html, tags);
+
+    Ok(())
+
 }
+
